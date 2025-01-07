@@ -81,7 +81,7 @@ export const  fetchAllProducts=async()=> {
         }
 
         // Make GET request to fetch all products
-        const response = await axios.get(`${baseUrl}/Items?$select=ItemCode,ItemName,BarCode`, {
+        const response = await axios.get(`${baseUrl}/Items?$select=ItemCode,ItemName,BarCode,ItemClass`, {
             headers: {
                 Cookie: `B1SESSION=${sessionId}`,
                 'Content-Type': 'application/json',

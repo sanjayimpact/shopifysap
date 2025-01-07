@@ -91,7 +91,7 @@
       try {
         // Fetch products from backend endpoint
         const response = await axios.get('/api/sapproducts'); // Endpoint to get products
-        console.log(response);
+        console.log(response.data);
         const products = response.data.data; // Extract products array
         const productsContainer = document.getElementById('sapproducts'); // Container for displaying products
 
@@ -103,14 +103,16 @@
               <div class="col-3">
                 <div class="card h-100 shadow-sm">
                   <div class="card-body text-center">
-                    <h5 class="card-title">${product.title}</h5>
+                    <h5 class="card-title">${product.ItemName}</h5>
                     <p class="card-text">
-                      ${product.body_html ? product.body_html.substring(0, 50) + '...' : 'No description available'}
+                      ItemClass: ${product?.ItemClass
+}
                     </p>
-                    <img src =${product?.image?.src} class="img-fluid w-50" alt="productImage"> </img>
+                 
                   </div>
                   <div class="card-footer text-center">
-                    <small class="text-muted">Product ID: ${product.id}</small>
+                    <small class="text-muted">Item Code: ${product?.ItemCode
+}</small>
                   </div>
                 </div>
               </div>
