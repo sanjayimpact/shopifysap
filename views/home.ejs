@@ -20,7 +20,7 @@
             
             <!-- Products section -->
             <h5 class="mt-4 mb-3">Shopify Products</h5>
-            <div id="products" class="row row-cols-1 row-cols-md-1 g-3">
+            <div id="products" class="row ">
               <!-- Products will be rendered here -->
             </div>
           </div>
@@ -50,14 +50,14 @@
           // Render up to 5 products
           products.slice(0, 5).forEach(product => {
             const productHtml = `
-              <div class="col">
+              <div class="col-2">
                 <div class="card h-100 shadow-sm">
                   <div class="card-body text-center">
                     <h5 class="card-title">${product.title}</h5>
                     <p class="card-text">
                       ${product.body_html ? product.body_html.substring(0, 50) + '...' : 'No description available'}
                     </p>
-                    <img src =${product?.image?.src} class="img-fluid" alt="productImage"> </img>
+                    <img src =${product?.image?.src} class="img-fluid w-50" alt="productImage"> </img>
                   </div>
                   <div class="card-footer text-center">
                     <small class="text-muted">Product ID: ${product.id}</small>
