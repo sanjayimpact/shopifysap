@@ -7,6 +7,7 @@ import axios from 'axios'
 import path from 'path';
 import { fileURLToPath } from 'url'
 import fs from 'fs'
+import { fetchAllProducts } from '../../config/sap.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -115,7 +116,10 @@ router.get('/products', async (req, res) => {
   }
 });
 
-
+router.get('/sapproducts',async(req,res)=>{
+  let data = await fetchAllProducts();
+  console.log(data);
+})
 
 
 

@@ -69,7 +69,7 @@ async function createSession() {
 }
 
 // Fetch All Products
-async function fetchAllProducts() {
+export const  fetchAllProducts=async()=> {
     try {
         // Read session ID from file
         let sessionId = fs.readFileSync(sessionFilePath, 'utf8').trim();
@@ -109,5 +109,5 @@ async function fetchAllProducts() {
 }
 
 // Execute the function
-fetchAllProducts();
+
 export default createSession;
