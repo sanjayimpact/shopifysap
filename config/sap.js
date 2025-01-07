@@ -39,8 +39,9 @@ async function createSession() {
 
         if (response.status === 200) {
             console.log('Login Successful!');
-
+            
             // Save session ID to a file
+            console.log(response.data);
             const sessionId = response.data.SessionId;
             fs.writeFileSync('session.txt', sessionId);
             console.log('Session ID stored in session.txt:', sessionId);
@@ -66,7 +67,7 @@ async function fetchAllProducts() {
             },
             httpsAgent: agent,
         });
-    
+    console.log(response.data.value);
         // console.log('All Products:', response.data.value); // SAP B1 returns data under 'value'
         return response.data.value;
 
