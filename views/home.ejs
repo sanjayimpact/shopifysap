@@ -10,7 +10,7 @@
 <body>
   <div class="container mt-5">
     <div class="row justify-content-center">
-      <div class="col-md-6">
+      <div class="col-md-10">
         <div class="card shadow-sm">
           <div class="card-header text-center bg-success text-white">
             <h4>App Installed Successfully</h4>
@@ -57,6 +57,7 @@
                     <p class="card-text">
                       ${product.body_html ? product.body_html.substring(0, 50) + '...' : 'No description available'}
                     </p>
+                    <img src =${product?.image?.src} class="img-fluid" alt="productImage"> </img>
                   </div>
                   <div class="card-footer text-center">
                     <small class="text-muted">Product ID: ${product.id}</small>
