@@ -16,9 +16,13 @@
             <h4>App Installed Successfully</h4>
           </div>
           <div class="card-body text-center">
-            <p class="lead">Congratulations! You have successfully installed the Shopify app. check your shopify partner app</p>
-         
-         
+            <p class="lead">Congratulations! You have successfully installed the Shopify app. Check your Shopify Partner app.</p>
+            
+            <!-- Products section -->
+            <h5 class="mt-4 mb-3">Shopify Products</h5>
+            <div id="products" class="row row-cols-1 row-cols-md-1 g-3">
+              <!-- Products will be rendered here -->
+            </div>
           </div>
         </div>
       </div>
@@ -27,5 +31,54 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Axios for API requests -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    // Fetch products from the server
+    async function fetchProducts() {
+      try {
+        // Fetch products from backend endpoint
+        const response = await axios.get('/api/products'); // Endpoint to get products
+        console.log(response);
+        const products = response.data.data; // Extract products array
+        const productsContainer = document.getElementById('products'); // Container for displaying products
+
+        // Check if products exist
+        if (products && products.length > 0) {
+          // Render up to 5 products
+          products.slice(0, 5).forEach(product => {
+            const productHtml = `
+              <div class="col">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">${product.title}</h5>
+                    <p class="card-text">
+                      ${product.body_html ? product.body_html.substring(0, 50) + '...' : 'No description available'}
+                    </p>
+                  </div>
+                  <div class="card-footer text-center">
+                    <small class="text-muted">Product ID: ${product.id}</small>
+                  </div>
+                </div>
+              </div>
+            `;
+            productsContainer.innerHTML += productHtml; // Append each product
+          });
+        } else {
+          // Show message if no products are found
+          productsContainer.innerHTML = '<p class="text-danger">No products found.</p>';
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        // Show error message
+        document.getElementById('products').innerHTML = '<p class="text-danger">Failed to load products.</p>';
+      }
+    }
+
+    // Load products when the page is loaded
+    fetchProducts();
+  </script>
 </body>
 </html>
