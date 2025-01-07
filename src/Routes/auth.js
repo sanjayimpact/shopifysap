@@ -16,24 +16,6 @@ const sessionFilePath = path.join(__dirname, 'session.json');
 const router = express.Router();
 
 
-//   const sessionData = {
-//       shop: session.shop,
-//       accessToken: session.accessToken,
-//       state: session.state,
-//       scope: session.scope,
-//   };
-//   fs.writeFileSync(sessionFilePath, JSON.stringify(sessionData, null, 2)); // Save session in JSON format
-//   console.log('Session saved successfully to file.');
-// }
-
-// // Read session data from JSON file
-// function readSessionFromFile() {
-//   if (fs.existsSync(sessionFilePath)) {
-//       const data = fs.readFileSync(sessionFilePath, 'utf8');
-//       return JSON.parse(data);
-//   }
-//   return null; // Return null if session file doesn't exist
-// }
 
 
 
@@ -91,7 +73,7 @@ router.get('/products', async (req, res) => {
       }
 
       // Construct the API URL for Shopify Admin API
-      const shopifyApiUrl = `https://${sessionData.shop}/admin/api/2025-01/products.json`; // Update version if needed
+      const shopifyApiUrl = `https://${sessionData.shop}/admin/api/2025-01/products.json?limit=10`; // Update version if needed
 
       // Make API request to fetch products
       const response = await axios.get(shopifyApiUrl, {
