@@ -116,10 +116,7 @@ router.get('/products', async (req, res) => {
   }
 });
 
-router.get('/sapproducts',(req,res)=>{
-  let data = fetchAllProducts();
-return data;
-})
+router.get('/sapproducts',fetchAllProducts)
 
 
 
