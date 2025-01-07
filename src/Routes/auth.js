@@ -4,9 +4,41 @@ import express from 'express';
 import  shopify  from '../../config/shopify.js';
 import { Session } from '../Models/Session.model.js';
 import axios from 'axios'
+import path from 'path';
+import { fileURLToPath } from 'url'
+import fs from 'fs'
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const sessionFilePath = path.join(__dirname, 'session.json');
 
 const router = express.Router();
+
+
+//   const sessionData = {
+//       shop: session.shop,
+//       accessToken: session.accessToken,
+//       state: session.state,
+//       scope: session.scope,
+//   };
+//   fs.writeFileSync(sessionFilePath, JSON.stringify(sessionData, null, 2)); // Save session in JSON format
+//   console.log('Session saved successfully to file.');
+// }
+
+// // Read session data from JSON file
+// function readSessionFromFile() {
+//   if (fs.existsSync(sessionFilePath)) {
+//       const data = fs.readFileSync(sessionFilePath, 'utf8');
+//       return JSON.parse(data);
+//   }
+//   return null; // Return null if session file doesn't exist
+// }
+
+
+
+if (!fs.existsSync(sessionFilePath)) {
+    fs.writeFileSync(sessionFilePath, ''); // Create empty file if missing
+}
 
 // Install/Auth Start
 router.get('/auth', async (req, res) => {
@@ -30,70 +62,56 @@ router.get('/auth', async (req, res) => {
 // Auth Callback
 router.get('/auth/callback', async (req, res) => {
   try {
-    const {session} = await shopify.auth.callback({
-      rawRequest: req,
-      rawResponse: res,
-    });
+      const { session } = await shopify.auth.callback({
+          rawRequest: req,
+          rawResponse: res,
+      });
 
-      console.log(session.accessToken);
-    // Save the session to the database
- console.log(session);
-let checkexist = await Session.findOne({shop:session.shop});
-if(checkexist){
-  console.log("Already exists")
-}
-else{
-  let sessionData =  new Session({
-    id:session.id,
-    shop:session.shop,
-    state:session.state,
-    scope:session.scope,
-    accessToken:session.accessToken,
+      console.log('Access Token:', session.accessToken);
+      console.log('Session:', session);
 
-  })
-  await sessionData.save();
-}
+      fs.writeFileSync(sessionFilePath, JSON.stringify(session, null, 2))
+     
 
-  res.redirect(`/home?host=${req.query.host}&shop=${session.shop}`);
+      res.redirect(`/home?host=${req.query.host}&shop=${session.shop}`);
   } catch (error) {
-    console.error('Error in auth callback:', error);
-    res.status(500).send('Error during authentication');
+      console.error('Error in auth callback:', error);
+      res.status(500).send('Error during authentication');
   }
 });
 
 router.get('/products', async (req, res) => {
   try {
-    // Retrieve the session from the database
-    const sessionData = await Session.findOne(); // Fetch the session (adjust the query as needed)
+      // Read session data from file
+    let data = fs.readFileSync(sessionFilePath, 'utf8');
+    let sessionData = JSON.parse(data);
+      if (!sessionData) {
+          return res.status(401).send('Session not found. Please authenticate first.');
+      }
 
+      // Construct the API URL for Shopify Admin API
+      const shopifyApiUrl = `https://${sessionData.shop}/admin/api/2025-01/products.json`; // Update version if needed
 
-    if (!sessionData) {
-      return res.status(401).send('Session not found. Please authenticate first.');
-    }
+      // Make API request to fetch products
+      const response = await axios.get(shopifyApiUrl, {
+          headers: {
+              'Content-Type': 'application/json',
+              'X-Shopify-Access-Token': sessionData.accessToken, // Use access token from session
+          },
+      });
 
-    // Construct the API URL for Shopify Admin API
-    const shopifyApiUrl = `https://${sessionData.shop}/admin/api/2025-01/products.json`; // Update version if needed
-
-    // Make API request to fetch products
-    const response = await axios.get(shopifyApiUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': sessionData.accessToken, // Use access token from session
-      },
-    });
-    console.log(response);
-if(response){
-  
-return res.status(200).json({data:response.data.products,isSuccess:true,message:"Successfully fetched"})
-}
-else{
-  return res.status(200).json({message:"Data not found",isSuccess:false})
-}
-
+      if (response && response.data.products) {
+          return res.status(200).json({
+              data: response.data.products,
+              isSuccess: true,
+              message: 'Successfully fetched products',
+          });
+      } else {
+          return res.status(200).json({ message: 'Data not found', isSuccess: false });
+      }
   } catch (error) {
-    console.error('Error fetching products:', error.message
-    );
-    res.status(500).json({message:'Error fetching products',isSuccess:false});
+      console.error('Error fetching products:', error.message);
+      res.status(500).json({ message: 'Error fetching products', isSuccess: false });
   }
 });
 

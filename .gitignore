@@ -2,3 +2,4 @@ node_modules
 sap_cert.pem
 session.txt
 .env
+session.json

@@ -26,7 +26,7 @@ const baseUrl = `${protocol}://${config.server}:${port}/b1s/v1`;
 
 // Session file path
 const sessionFilePath = path.join(__dirname, 'session.txt');
-console.log('Session File Path:', sessionFilePath);
+// console.log('Session File Path:', sessionFilePath);
 
 // Ensure the session file exists
 if (!fs.existsSync(sessionFilePath)) {
@@ -89,7 +89,7 @@ async function fetchAllProducts() {
             httpsAgent: agent,
         });
 
-        console.log('All Products:', response.data.value); // SAP B1 returns data under 'value'
+        // console.log('All Products:', response.data.value); // SAP B1 returns data under 'value'
         return response.data.value;
     } catch (error) {
         console.error('Error fetching products:', error.message);
