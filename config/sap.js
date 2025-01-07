@@ -2,23 +2,37 @@ import axios from 'axios';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import https from 'https';
-import path from 'path'
+import path from 'path';
+import { fileURLToPath } from 'url';
 dotenv.config();
+
+// Polyfill for __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // SAP B1 Configuration
 const config = {
-    server: process.env.SAP_SERVER,    
-    company_db: process.env.SAP_COMPANY_DB,      
-    username: process.env.SAP_USERNAME,        
-    password: process.env.SAP_PASSWORD,       
-    use_ssl: true,               
+    server: process.env.SAP_SERVER,
+    company_db: process.env.SAP_COMPANY_DB,
+    username: process.env.SAP_USERNAME,
+    password: process.env.SAP_PASSWORD,
+    use_ssl: true,
 };
 
 // Build the Service Layer URL
 const protocol = config.use_ssl ? 'https' : 'http';
 const port = config.use_ssl ? 50000 : 50001;
 const baseUrl = `${protocol}://${config.server}:${port}/b1s/v1`;
-const sessionFilePath = path.join(import.meta.dirname, 'session.txt');
+
+// Session file path
+const sessionFilePath = path.join(__dirname, 'session.txt');
+console.log('Session File Path:', sessionFilePath);
+
+// Ensure the session file exists
+if (!fs.existsSync(sessionFilePath)) {
+    fs.writeFileSync(sessionFilePath, ''); // Create empty file if missing
+}
+
 // Create HTTPS Agent for SSL Handling
 const agent = new https.Agent({
     ca: fs.readFileSync('./sap_cert.pem'), // Replace with actual path to the certificate
@@ -27,25 +41,25 @@ const agent = new https.Agent({
 // Create a Session
 async function createSession() {
     try {
-        const response = await axios.post(`${baseUrl}/Login`, 
+        const response = await axios.post(
+            `${baseUrl}/Login`,
             {
-            CompanyDB: config.company_db,
-            UserName: config.username,
-            Password: config.password,
-        },
-        
-        { httpsAgent: agent }    
-    
-    );
+                CompanyDB: config.company_db,
+                UserName: config.username,
+                Password: config.password,
+            },
+            { httpsAgent: agent }
+        );
 
         if (response.status === 200) {
             console.log('Login Successful!');
-            
-            // Save session ID to a file
-         
             const sessionId = response.data.SessionId;
+
+            // Save session ID to file
             fs.writeFileSync(sessionFilePath, sessionId);
-       
+            console.log('Session ID saved:', sessionId);
+
+            return sessionId;
         } else {
             console.error('Login Failed:', response.statusText);
         }
@@ -54,14 +68,17 @@ async function createSession() {
     }
 }
 
-
-// // Fetch All Products Function
-console.log(sessionFilePath);
+// Fetch All Products
 async function fetchAllProducts() {
     try {
         // Read session ID from file
-        const sessionId = fs.readFileSync(sessionFilePath, 'utf8');
-        console.log(sessionId);
+        let sessionId = fs.readFileSync(sessionFilePath, 'utf8').trim();
+
+        // If session ID is empty, create a new session
+        if (!sessionId) {
+            console.log('No session found. Creating a new session...');
+            sessionId = await createSession();
+        }
 
         // Make GET request to fetch all products
         const response = await axios.get(`${baseUrl}/Items?$select=ItemCode,ItemName,BarCode`, {
@@ -71,25 +88,26 @@ async function fetchAllProducts() {
             },
             httpsAgent: agent,
         });
-    console.log(response.data.value);
-        // console.log('All Products:', response.data.value); // SAP B1 returns data under 'value'
-        return response.data.value;
 
+        console.log('All Products:', response.data.value); // SAP B1 returns data under 'value'
+        return response.data.value;
     } catch (error) {
         console.error('Error fetching products:', error.message);
 
-        // Handle session timeout and re-login
+        // Handle session timeout (401) and re-login
         if (error.response && error.response.status === 401) {
             console.log('Session expired. Re-authenticating...');
-            await createSession(); // Re-authenticate
-            return fetchAllProducts(); // Retry fetching products
+            const newSessionId = await createSession(); // Re-authenticate
+
+            // Retry fetching products with the new session ID
+            if (newSessionId) {
+                fs.writeFileSync(sessionFilePath, newSessionId); // Save new session ID
+                return fetchAllProducts(); // Retry fetching products
+            }
         }
     }
 }
 
-
-
-
-// // // Execute the function
+// Execute the function
 fetchAllProducts();
 export default createSession;
