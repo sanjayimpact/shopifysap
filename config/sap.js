@@ -44,7 +44,7 @@ async function createSession() {
             console.log(response.data);
             const sessionId = response.data.SessionId;
             fs.writeFileSync('session.txt', sessionId);
-            console.log('Session ID stored in session.txt:', sessionId);
+       
         } else {
             console.error('Login Failed:', response.statusText);
         }
@@ -57,7 +57,7 @@ async function createSession() {
 async function fetchAllProducts() {
     try {
         // Read session ID from file
-        const sessionId = fs.readFileSync('session.txt', 'utf8');
+        const sessionId = fs.readFileSync('../session.txt', 'utf8');
 
         // Make GET request to fetch all products
         const response = await axios.get(`${baseUrl}/Items?$select=ItemCode,ItemName,BarCode`, {
