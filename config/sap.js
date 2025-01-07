@@ -2,6 +2,7 @@ import axios from 'axios';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import https from 'https';
+import path from 'path'
 dotenv.config();
 
 // SAP B1 Configuration
@@ -17,7 +18,7 @@ const config = {
 const protocol = config.use_ssl ? 'https' : 'http';
 const port = config.use_ssl ? 50000 : 50001;
 const baseUrl = `${protocol}://${config.server}:${port}/b1s/v1`;
-
+const sessionFilePath = path.join(import.meta.dirname, 'session.txt');
 // Create HTTPS Agent for SSL Handling
 const agent = new https.Agent({
     ca: fs.readFileSync('./sap_cert.pem'), // Replace with actual path to the certificate
@@ -41,9 +42,9 @@ async function createSession() {
             console.log('Login Successful!');
             
             // Save session ID to a file
-            console.log(response.data);
+         
             const sessionId = response.data.SessionId;
-            fs.writeFileSync('session.txt', sessionId);
+            fs.writeFileSync(sessionFilePath, sessionId);
        
         } else {
             console.error('Login Failed:', response.statusText);
@@ -53,11 +54,14 @@ async function createSession() {
     }
 }
 
+
 // // Fetch All Products Function
+console.log(sessionFilePath);
 async function fetchAllProducts() {
     try {
         // Read session ID from file
-        const sessionId = fs.readFileSync('../session.txt', 'utf8');
+        const sessionId = fs.readFileSync(sessionFilePath, 'utf8');
+        console.log(sessionId);
 
         // Make GET request to fetch all products
         const response = await axios.get(`${baseUrl}/Items?$select=ItemCode,ItemName,BarCode`, {

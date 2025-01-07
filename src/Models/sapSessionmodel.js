@@ -5,4 +5,4 @@ const sapsessionSchema = new mongoose.Schema({
         trime:true
     }
 })
-export const SapSession = mongoose.model({'SapSession',sapsessionSchema});
+export const SapSession = mongoose.model('SapSession',sapsessionSchema);
