@@ -17,7 +17,7 @@ const appScopes = SCOPES ? SCOPES.split(',') : [];
 const shopify = shopifyApi({
   apiKey: SHOPIFY_CLIENT,
   apiSecretKey: SHOPIFY_SECRET,
-  scopes: ['read_products'],
+  scopes: appScopes,
 
   // Remove the protocol (http/https) from HOST
   hostName: HOST ? HOST.replace(/https?:\/\//, '') : '',

@@ -2,21 +2,15 @@ import axios from 'axios';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import https from 'https';
-
-
-
-
-
-
 dotenv.config();
 
 // SAP B1 Configuration
 const config = {
-    server: '203.143.87.235',    // Replace with your SAP server IP
-    company_db: 'INTECHPORTAL',      // Replace with your SAP company database
-    username: 'Manager',         // SAP username
-    password: 'Intech@111',        // SAP password
-    use_ssl: true,               // true for HTTPS, false for HTTP
+    server: process.env.SAP_SERVER,    
+    company_db: process.env.SAP_COMPANY_DB,      
+    username: process.env.SAP_USERNAME,        
+    password: process.env.SAP_PASSWORD,       
+    use_ssl: true,               
 };
 
 // Build the Service Layer URL
