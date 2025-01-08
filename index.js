@@ -10,12 +10,14 @@ import createSession from './config/sap.js';
 import shopify  from './config/shopify.js';
 import { create } from 'domain';
 import ejs from 'ejs'
+import { webhookRouter } from './src/Routes/webhook.routes.js';
 
 
 const app = express();
 const port = process.env.PORT || 3000;
+app.use(express.raw({ type: 'application/json' }));
 
-
+app.use('/shopify',webhookRouter)
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,6 +32,7 @@ app.set('view engine', 'ejs');
 // Mount your auth routes
 app.use('/api', authRoute);
 
+
 app.use(express.static(path.join(process.cwd(), './build')));
 app.get('/',(req,res)=>{
   res.render("index")
@@ -41,9 +44,7 @@ app.get('/home',(req,res)=>{
 // Handle all routes by serving the React app index.html
 
 
-app.post("/shopifywebhook",(req,res)=>{
-  console.log(req.body);
-})
+
 app.listen(port, err => {
   createSession();
   if (err) {

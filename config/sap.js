@@ -9,7 +9,7 @@ dotenv.config();
 // Polyfill for __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 // SAP B1 Configuration
 const config = {
     server: process.env.SAP_SERVER,
@@ -18,6 +18,7 @@ const config = {
     password: process.env.SAP_PASSWORD,
     use_ssl: true,
 };
+
 
 // Build the Service Layer URL
 const protocol = config.use_ssl ? 'https' : 'http';
@@ -38,6 +39,8 @@ const agent = new https.Agent({
     ca: fs.readFileSync('./sap_cert.pem'), // Replace with actual path to the certificate
 });
 
+console.log(baseUrl);
+
 // Create a Session
 async function createSession() {
     try {
@@ -48,7 +51,7 @@ async function createSession() {
                 UserName: config.username,
                 Password: config.password,
             },
-            { httpsAgent: agent }
+            { httpsAgent: agent } // Uncomment this if SSL verification is required
         );
 
         if (response.status === 200) {
@@ -61,10 +64,22 @@ async function createSession() {
 
             return sessionId;
         } else {
-            console.error('Login Failed:', response.statusText);
+            console.error('Login Failed:', response.status, response.data);
         }
     } catch (error) {
         console.error('Error connecting to SAP:', error.message);
+
+       // Enhanced Error Logging
+        // if (error.response) {
+        
+        //     console.error('Response Status:', error.response.status);
+        //     console.error('Response Data:', error.response.data); // Logs SAP error message
+        //     console.error('Response Headers:', error.response.headers);
+        // } else if (error.request) {
+        //     console.error('No response received from server:', error.request);
+        // } else {
+        //     console.error('Error setting up the request:', error.message);
+        // }
     }
 }
 
