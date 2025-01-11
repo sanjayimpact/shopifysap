@@ -34,7 +34,7 @@ app.use('/api', authRoute);
 
 
 app.use(express.static(path.join(process.cwd(), './build')));
-app.get('/index',(req,res)=>{
+app.get('/',(req,res)=>{
   res.render("index")
 
 })
