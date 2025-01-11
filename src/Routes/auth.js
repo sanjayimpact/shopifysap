@@ -50,11 +50,22 @@ router.get('/auth/callback', async (req, res) => {
           rawResponse: res,
       });
 
-      console.log('Access Token:', session.accessToken);
-      console.log('Session:', session);
-
-      fs.writeFileSync(sessionFilePath, JSON.stringify(session, null, 2))
-     
+      
+      const { id, shop, state, scope, accessToken } = session;
+      const existingSession = await Session.findOne({ shop });
+      if (!existingSession) {
+        // Create a new session entry if it doesn't exist
+        const newSession = new Session({
+          id,
+          shop,
+          state,
+          scope,
+          accessToken,
+        });
+  
+        await newSession.save();
+      }
+      
 
       res.redirect(`/home?host=${req.query.host}&shop=${session.shop}`);
   } catch (error) {
@@ -66,11 +77,12 @@ router.get('/auth/callback', async (req, res) => {
 router.get('/products', async (req, res) => {
   try {
       // Read session data from file
-    let data = fs.readFileSync(sessionFilePath, 'utf8');
-    let sessionData = JSON.parse(data);
-      if (!sessionData) {
-          return res.status(401).send('Session not found. Please authenticate first.');
-      }
+      const sessionData = await Session.findOne();
+    if(!sessionData){
+      res.status(404).json({message: 'Session not found'})
+
+    }
+  
 
       // Construct the API URL for Shopify Admin API
       const shopifyApiUrl = `https://intech-tools.myshopify.com/admin/api/2025-01/products.json?limit=10`; // Update version if needed
