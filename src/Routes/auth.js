@@ -79,7 +79,7 @@ router.get('/products', async (req, res) => {
       const response = await axios.get(shopifyApiUrl, {
           headers: {
               'Content-Type': 'application/json',
-              'X-Shopify-Access-Token': sessionData.accessToken, // Use access token from session
+              'X-Shopify-Access-Token': "shpua_e4c5f2d15e1f39c61de0ec135ed26f17", // Use access token from session
           },
       });
 
