@@ -73,7 +73,7 @@ router.get('/products', async (req, res) => {
       }
 
       // Construct the API URL for Shopify Admin API
-      const shopifyApiUrl = `https://${sessionData.shop}/admin/api/2025-01/products.json?limit=10`; // Update version if needed
+      const shopifyApiUrl = `https://intech-tools.myshopify.com/admin/api/2025-01/products.json?limit=10`; // Update version if needed
 
       // Make API request to fetch products
       const response = await axios.get(shopifyApiUrl, {
