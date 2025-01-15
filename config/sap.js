@@ -24,7 +24,7 @@ const config = {
 const protocol = config.use_ssl ? 'https' : 'http';
 const port = config.use_ssl ? 50000 : 50001;
 const baseUrl = `${protocol}://${config.server}:${port}/b1s/v1`;
-
+console.log(baseUrl);
 // Session file path
 const sessionFilePath = path.join(__dirname, 'session.txt');
 // console.log('Session File Path:', sessionFilePath);

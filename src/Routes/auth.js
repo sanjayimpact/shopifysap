@@ -8,13 +8,15 @@ import path from 'path';
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 import { fetchAllProducts } from '../../config/sap.js';
+import { Admin } from '../Models/Admin.model.js';
+import bcrypt from 'bcrypt';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const sessionFilePath = path.join(__dirname, 'session.json');
 
 const router = express.Router();
-
+const saltRounds = 10;
 
 
 
@@ -77,11 +79,12 @@ router.get('/auth/callback', async (req, res) => {
 router.get('/products', async (req, res) => {
   try {
       // Read session data from file
-      const sessionData = await Session.findOne();
+      const sessionData = await Session.findOne({shop:"intech-tools.myshopify.com"});
     if(!sessionData){
       res.status(404).json({message: 'Session not found'})
 
-    }
+    } 
+    console.log(sessionData);
   
 
       // Construct the API URL for Shopify Admin API
@@ -111,10 +114,57 @@ router.get('/products', async (req, res) => {
 });
 
 
+//admin login
+router.post("/login",async(req,res)=>{
+  const{name,password} = req.body;
+
+  try{
+    //check user
+
+    let username = await Admin.findOne({name:name});
+    console.log(username);
+    if(!username){
+      return res.status(200).json({message:"Invalid Creadentials",isSuccess:false})
+    }
+    let check = bcrypt.compare(password,username.password);
+    if(!check){
+      return res.status(200).json({message:"Invalid Creadentials",isSuccess:false})
+    }
+    else{
+     return  res.redirect('/index');
+     
+    }
+
+  }catch(err){
+    return res.status(400).json({message:err.message,isSuccess:false})
+  }
+})
 
 
+// router.post("/addAdmin",async(req,res)=>{
+//   const{name,password} = req.body;
 
+//   try{
+//      let exist = await Admin.findOne({name:name});
+//      if(exist){
+//       return res.status(200).json({message:"Already Exists",isSuccess:false})
+//      }
+       
+//      else{
+//       let salt=  bcrypt.genSaltSync(saltRounds);
+//       const hashpass = bcrypt.hashSync(password, salt);
+//       let newuser = new Admin({
+//         name:name,
+//         password:hashpass
 
+//       })
+//       await newuser.save();
+//       return res.status(200).json({message:"Successfully created"})
+//      }
+//   }catch(err){
+//     return res.status(200).json({message:err.message})
+//   }
+// })
 
 
 

@@ -15,12 +15,13 @@ import { webhookRouter } from './src/Routes/webhook.routes.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(express.raw({ type: 'application/json' }));
-
-app.use('/shopify',webhookRouter)
-app.use(cors());
+app.use('/shopify',express.raw({ type: 'application/json' }),webhookRouter)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
+app.use(cors());
+
 
 // Serve static files
 
@@ -35,8 +36,11 @@ app.use('/api', authRoute);
 
 app.use(express.static(path.join(process.cwd(), './build')));
 app.get('/',(req,res)=>{
-  res.render("index")
+  res.render("login")
 
+})
+app.get('/index',(req,res)=>{
+  res.render("index")
 })
 app.get('/home',(req,res)=>{
   res.render("home")
