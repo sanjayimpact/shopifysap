@@ -10,6 +10,7 @@ import fs from 'fs'
 import { fetchAllProducts } from '../../config/sap.js';
 import { Admin } from '../Models/Admin.model.js';
 import bcrypt from 'bcrypt';
+import { validateShopifyRequest } from '../middleware/authmiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,7 +77,7 @@ router.get('/auth/callback', async (req, res) => {
   }
 });
 
-router.get('/products', async (req, res) => {
+router.get('/products', validateShopifyRequest,async (req, res) => {
   try {
       // Read session data from file
       const sessionData = await Session.findOne({shop:"intech-tools.myshopify.com"});
@@ -177,7 +178,7 @@ router.post("/login",async(req,res)=>{
 
 
 
-router.get('/sapproducts',async (req,res)=>{
+router.get('/sapproducts',validateShopifyRequest,async (req,res)=>{
   let data = await fetchAllProducts();
  return res.status(200).json({data:data});
 })
