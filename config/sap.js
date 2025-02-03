@@ -70,16 +70,16 @@ async function createSession() {
         console.error('Error connecting to SAP:', error.message);
 
        // Enhanced Error Logging
-        // if (error.response) {
+        if (error.response) {
         
-        //     console.error('Response Status:', error.response.status);
-        //     console.error('Response Data:', error.response.data); // Logs SAP error message
-        //     console.error('Response Headers:', error.response.headers);
-        // } else if (error.request) {
-        //     console.error('No response received from server:', error.request);
-        // } else {
-        //     console.error('Error setting up the request:', error.message);
-        // }
+            console.error('Response Status:', error.response.status);
+            console.error('Response Data:', error.response.data); // Logs SAP error message
+            console.error('Response Headers:', error.response.headers);
+        } else if (error.request) {
+            console.error('No response received from server:', error.request);
+        } else {
+            console.error('Error setting up the request:', error.message);
+        }
     }
 }
 

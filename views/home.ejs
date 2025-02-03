@@ -49,7 +49,7 @@
       try {
         // Fetch products from backend endpoint
         const response = await axios.get('/api/products'); // Endpoint to get products
-        console.log(response);
+      
         const products = response.data.data; // Extract products array
         const productsContainer = document.getElementById('products'); // Container for displaying products
 

@@ -84,7 +84,7 @@ router.get('/products', async (req, res) => {
       res.status(404).json({message: 'Session not found'})
 
     } 
-    console.log(sessionData);
+
   
 
       // Construct the API URL for Shopify Admin API

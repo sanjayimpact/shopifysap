@@ -11,10 +11,11 @@ import shopify  from './config/shopify.js';
 import { create } from 'domain';
 import ejs from 'ejs'
 import { webhookRouter } from './src/Routes/webhook.routes.js';
+import { validateShopifyRequest } from './src/middleware/authmiddleware.js';
 
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.use('/shopify',express.raw({ type: 'application/json' }),webhookRouter)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,7 +43,7 @@ app.get('/',(req,res)=>{
 app.get('/index',(req,res)=>{
   res.render("index")
 })
-app.get('/home',(req,res)=>{
+app.get('/home', validateShopifyRequest,(req,res)=>{
   res.render("home")
 })
 // Handle all routes by serving the React app index.html
