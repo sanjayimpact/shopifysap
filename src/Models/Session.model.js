@@ -24,7 +24,7 @@ isOnline:{
 },
 scope:
     {
-        type:String,
+        type:[String],
         trim:true
     }
 ,
